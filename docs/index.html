@@ -1,0 +1,1072 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <title>Predicting Search Discoverability Loss with Machine Learning</title>
+
+  <meta
+    name="description"
+    content="A FlyRank ML study investigating whether search and content signals can identify pages at risk of losing discoverability."
+  >
+
+  <style>
+    * {
+      box-sizing: border-box;
+    }
+
+    html {
+      scroll-behavior: smooth;
+    }
+
+    body {
+      margin: 0;
+      font-family: Inter, Arial, sans-serif;
+      line-height: 1.7;
+      background: #f6f7fb;
+      color: #20242a;
+    }
+
+    .container {
+      width: min(1050px, 92%);
+      margin: auto;
+    }
+
+    header {
+      background: #111827;
+      color: white;
+      padding: 70px 0 60px;
+    }
+
+    header .tag {
+      display: inline-block;
+      padding: 6px 12px;
+      border: 1px solid #64748b;
+      border-radius: 999px;
+      font-size: 14px;
+      margin-bottom: 20px;
+    }
+
+    h1 {
+      font-size: clamp(2.2rem, 5vw, 4rem);
+      line-height: 1.1;
+      margin: 0 0 20px;
+      max-width: 900px;
+    }
+
+    .subtitle {
+      font-size: 1.15rem;
+      color: #cbd5e1;
+      max-width: 800px;
+    }
+
+    .author {
+      margin-top: 25px;
+      color: #cbd5e1;
+    }
+
+    nav {
+      position: sticky;
+      top: 0;
+      z-index: 10;
+      background: white;
+      border-bottom: 1px solid #e5e7eb;
+    }
+
+    nav .container {
+      display: flex;
+      gap: 18px;
+      overflow-x: auto;
+      padding: 13px 0;
+    }
+
+    nav a {
+      color: #374151;
+      text-decoration: none;
+      white-space: nowrap;
+      font-size: 14px;
+    }
+
+    nav a:hover {
+      color: #111827;
+    }
+
+    main {
+      padding: 45px 0;
+    }
+
+    section {
+      background: white;
+      margin-bottom: 28px;
+      padding: 38px;
+      border-radius: 16px;
+      border: 1px solid #e5e7eb;
+      box-shadow: 0 4px 18px rgba(0, 0, 0, 0.04);
+    }
+
+    h2 {
+      margin-top: 0;
+      font-size: 2rem;
+      line-height: 1.25;
+    }
+
+    h3 {
+      margin-top: 30px;
+      font-size: 1.25rem;
+    }
+
+    p {
+      max-width: 850px;
+    }
+
+    .abstract {
+      font-size: 1.08rem;
+    }
+
+    .callout {
+      background: #f1f5f9;
+      border-left: 4px solid #334155;
+      padding: 18px 20px;
+      margin: 22px 0;
+      border-radius: 8px;
+    }
+
+    .warning {
+      background: #fff7ed;
+      border-left: 4px solid #ea580c;
+    }
+
+    .success {
+      background: #f0fdf4;
+      border-left: 4px solid #16a34a;
+    }
+
+    .stats {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 14px;
+      margin: 25px 0;
+    }
+
+    .stat {
+      padding: 20px;
+      background: #f8fafc;
+      border: 1px solid #e5e7eb;
+      border-radius: 12px;
+    }
+
+    .stat strong {
+      display: block;
+      font-size: 1.7rem;
+      margin-bottom: 4px;
+    }
+
+    .stat span {
+      font-size: 14px;
+      color: #64748b;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 22px 0;
+      font-size: 14px;
+    }
+
+    th,
+    td {
+      border: 1px solid #e5e7eb;
+      padding: 12px;
+      text-align: left;
+    }
+
+    th {
+      background: #f8fafc;
+    }
+
+    .bar-chart {
+      margin: 25px 0;
+    }
+
+    .bar-row {
+      display: grid;
+      grid-template-columns: 180px 1fr 70px;
+      align-items: center;
+      gap: 12px;
+      margin: 13px 0;
+    }
+
+    .bar {
+      height: 24px;
+      background: #cbd5e1;
+      border-radius: 6px;
+      overflow: hidden;
+    }
+
+    .fill {
+      height: 100%;
+      background: #334155;
+      border-radius: 6px;
+    }
+
+    figure {
+      margin: 30px 0;
+    }
+
+    figcaption {
+      font-size: 14px;
+      color: #64748b;
+      margin-top: 10px;
+    }
+
+    .recommendations {
+      display: grid;
+      gap: 16px;
+    }
+
+    .recommendation {
+      border: 1px solid #e5e7eb;
+      border-radius: 12px;
+      padding: 20px;
+    }
+
+    .rank {
+      display: inline-block;
+      font-weight: bold;
+      margin-bottom: 8px;
+    }
+
+    code {
+      background: #f1f5f9;
+      padding: 3px 6px;
+      border-radius: 5px;
+      font-size: 0.9em;
+    }
+
+    a {
+      color: #2563eb;
+    }
+
+    footer {
+      background: #111827;
+      color: #cbd5e1;
+      padding: 40px 0;
+      margin-top: 20px;
+    }
+
+    footer a {
+      color: white;
+    }
+
+    @media (max-width: 800px) {
+      section {
+        padding: 25px;
+      }
+
+      .stats {
+        grid-template-columns: repeat(2, 1fr);
+      }
+
+      .bar-row {
+        grid-template-columns: 120px 1fr 60px;
+      }
+    }
+
+    @media (max-width: 520px) {
+      .stats {
+        grid-template-columns: 1fr;
+      }
+
+      section {
+        padding: 20px;
+      }
+
+      .bar-row {
+        grid-template-columns: 1fr;
+        gap: 5px;
+      }
+    }
+  </style>
+</head>
+
+<body>
+
+<header>
+  <div class="container">
+
+    <div class="tag">ML-11 · Research Paper</div>
+
+    <h1>
+      Predicting Search Discoverability Loss with Machine Learning
+    </h1>
+
+    <p class="subtitle">
+      Using historical search-performance and content signals to identify
+      pages that may require human investigation before their discoverability
+      declines.
+    </p>
+
+    <p class="author">
+      <strong>Prithiviraj R.</strong><br>
+      Machine Learning Track · FlyRank ML Internship
+    </p>
+
+  </div>
+</header>
+
+<nav>
+  <div class="container">
+    <a href="#abstract">Abstract</a>
+    <a href="#introduction">Introduction</a>
+    <a href="#data">Data</a>
+    <a href="#methodology">Methodology</a>
+    <a href="#results">Results</a>
+    <a href="#limitations">Limitations</a>
+    <a href="#recommendations">Recommendations</a>
+    <a href="#reproducibility">Reproducibility</a>
+    <a href="#acknowledgments">Acknowledgments</a>
+  </div>
+</nav>
+
+<main class="container">
+
+  <!-- ABSTRACT -->
+
+  <section id="abstract">
+
+    <h2>1. Title + Abstract</h2>
+
+    <p class="abstract">
+      <strong>Question:</strong>
+      Can historical search-performance and content signals help identify
+      pages that are at risk of losing search discoverability?
+    </p>
+
+    <p class="abstract">
+      <strong>Data:</strong>
+      This study uses the FlyRank ML Internship dataset, using a February
+      2026 feature window and a March 2026 outcome window, with 29,353 pages
+      in the final modeling dataset.
+    </p>
+
+    <p class="abstract">
+      <strong>Method:</strong>
+      A dummy classifier was used as a baseline and compared with Logistic
+      Regression and HistGradientBoosting using the same train/test split
+      and 13 input features.
+    </p>
+
+    <p class="abstract">
+      <strong>Result:</strong>
+      The outcome was highly imbalanced, with 1,159 of 29,353 pages
+      labeled as went-dark, or approximately 3.95%; the models therefore
+      showed an important trade-off between detecting rare events and
+      maintaining precision.
+    </p>
+
+    <p class="abstract">
+      <strong>Use:</strong>
+      The resulting signals are best treated as decision support for human
+      content and SEO review rather than as an automatic ranking or publishing
+      system.
+    </p>
+
+    <div class="callout">
+      <strong>Headline finding:</strong>
+      Accuracy alone can make a model appear strong on this imbalanced
+      problem. The results show why recall, precision, F1, PR-AUC and the
+      base rate should be considered together.
+    </div>
+
+  </section>
+
+
+  <!-- INTRODUCTION -->
+
+  <section id="introduction">
+
+    <h2>2. Introduction / Problem Statement</h2>
+
+    <p>
+      Search visibility is not static. A page can receive impressions and
+      clicks during one period and later show substantially weaker search
+      performance. For a content team, the practical problem is not simply
+      predicting a number: it is deciding which pages deserve human attention
+      first.
+    </p>
+
+    <p>
+      This study frames the problem as a classification task. The objective
+      is to use information available during an earlier observation window
+      to identify pages associated with a later loss of discoverability.
+    </p>
+
+    <p>
+      The intended decision is therefore a prioritization decision:
+      <em>which pages should an analyst investigate?</em>
+      The model is not intended to automatically edit, delete, redirect,
+      publish, or otherwise change content.
+    </p>
+
+    <div class="callout">
+      <strong>Research question:</strong>
+      Can February search-performance and content features provide useful
+      signals for identifying pages that become “went dark” in the following
+      March observation window?
+    </div>
+
+  </section>
+
+
+  <!-- DATA -->
+
+  <section id="data">
+
+    <h2>3. Data</h2>
+
+    <p>
+      The analysis is based on the FlyRank ML Internship dataset. The study
+      uses a historical feature window followed by a later outcome window
+      so that information from the future outcome period is not used as an
+      input to the prediction.
+    </p>
+
+    <div class="stats">
+
+      <div class="stat">
+        <strong>29,353</strong>
+        <span>Final modeling rows</span>
+      </div>
+
+      <div class="stat">
+        <strong>13</strong>
+        <span>Model features</span>
+      </div>
+
+      <div class="stat">
+        <strong>1,159</strong>
+        <span>Went-dark pages</span>
+      </div>
+
+      <div class="stat">
+        <strong>3.95%</strong>
+        <span>Went-dark rate</span>
+      </div>
+
+    </div>
+
+    <h3>Time windows</h3>
+
+    <table>
+      <tr>
+        <th>Window</th>
+        <th>Purpose</th>
+      </tr>
+
+      <tr>
+        <td>February 2026</td>
+        <td>Feature / observation window</td>
+      </tr>
+
+      <tr>
+        <td>March 2026</td>
+        <td>Outcome / label window</td>
+      </tr>
+    </table>
+
+    <h3>Input features</h3>
+
+    <p>
+      The final modeling table contained the following 13 features:
+    </p>
+
+    <ul>
+      <li>February impressions</li>
+      <li>February clicks</li>
+      <li>February CTR</li>
+      <li>February average position</li>
+      <li>Word count</li>
+      <li>Character count</li>
+      <li>Keyword character count</li>
+      <li>Keyword token count</li>
+      <li>URL character count</li>
+      <li>Search volume</li>
+      <li>Competition</li>
+      <li>Backlinks</li>
+      <li>Category count</li>
+    </ul>
+
+    <h3>Outcome definition</h3>
+
+    <p>
+      The target variable is <code>went_dark</code>. The final dataset
+      contains 1,159 positive cases out of 29,353 modeling rows, producing
+      a positive-class rate of approximately 3.95%.
+    </p>
+
+    <h3>Exclusions and missing data</h3>
+
+    <p>
+      The modeling universe was restricted to records that could be matched
+      across the feature and outcome construction required for the study.
+      Missing values were handled within the modeling workflow rather than
+      silently dropping observations.
+    </p>
+
+    <p>
+      Several variables contained missing values, including word count,
+      character count, search volume, competition, and backlinks. The
+      modeling workflow therefore used imputation where required.
+    </p>
+
+    <div class="callout warning">
+      <strong>Public-safety note:</strong>
+      This paper intentionally does not expose client names, private URLs,
+      raw search queries, credentials, or other private information.
+    </div>
+
+  </section>
+
+
+  <!-- METHODOLOGY -->
+
+  <section id="methodology">
+
+    <h2>4. Methodology</h2>
+
+    <h3>Modeling setup</h3>
+
+    <p>
+      The analysis compares a simple majority-class baseline with two
+      supervised machine-learning models:
+    </p>
+
+    <ul>
+      <li>Dummy Classifier</li>
+      <li>Logistic Regression</li>
+      <li>HistGradientBoosting</li>
+    </ul>
+
+    <h3>Validation design</h3>
+
+    <p>
+      The final modeling data was divided into a training set of 23,482
+      rows and a test set of 5,871 rows. The models were evaluated on the
+      same held-out test split so that their results could be compared fairly.
+    </p>
+
+    <h3>Class imbalance</h3>
+
+    <p>
+      Only 3.95% of observations belonged to the positive went-dark class.
+      This makes accuracy an incomplete metric because a model can achieve
+      high accuracy largely by predicting the majority class.
+    </p>
+
+    <h3>Leakage considerations</h3>
+
+    <p>
+      The feature window precedes the label window. The outcome period is
+      therefore kept separate from the input features used to make the
+      prediction. This temporal ordering reduces the risk of using future
+      outcome information as a predictor.
+    </p>
+
+    <h3>Evaluation metrics</h3>
+
+    <p>
+      Because the positive class is rare, the evaluation considers accuracy,
+      precision, recall, F1, ROC-AUC and PR-AUC rather than accuracy alone.
+    </p>
+
+    <div class="callout">
+      <strong>Interpretation rule:</strong>
+      A model score is a signal for investigation, not proof that a page
+      will lose rankings or that a particular content change will cause
+      improvement.
+    </div>
+
+  </section>
+
+
+  <!-- RESULTS -->
+
+  <section id="results">
+
+    <h2>5. Results</h2>
+
+    <p>
+      The baseline and both machine-learning models were evaluated on the
+      same held-out test set.
+    </p>
+
+    <table>
+
+      <thead>
+        <tr>
+          <th>Model</th>
+          <th>Accuracy</th>
+          <th>Precision</th>
+          <th>Recall</th>
+          <th>F1</th>
+          <th>PR-AUC</th>
+          <th>ROC-AUC</th>
+        </tr>
+      </thead>
+
+      <tbody>
+
+        <tr>
+          <td>Dummy Baseline</td>
+          <td>0.9605</td>
+          <td>0.0000</td>
+          <td>0.0000</td>
+          <td>0.0000</td>
+          <td>—</td>
+          <td>—</td>
+        </tr>
+
+        <tr>
+          <td>Logistic Regression</td>
+          <td>0.6462</td>
+          <td>0.0905</td>
+          <td>0.8793</td>
+          <td>0.1642</td>
+          <td>0.1323</td>
+          <td>0.8270</td>
+        </tr>
+
+        <tr>
+          <td>HistGradientBoosting</td>
+          <td>0.9605</td>
+          <td>0.5000</td>
+          <td>0.0043</td>
+          <td>0.0085</td>
+          <td>0.2189</td>
+          <td>0.8700</td>
+        </tr>
+
+      </tbody>
+
+    </table>
+
+    <h3>Accuracy comparison</h3>
+
+    <div class="bar-chart">
+
+      <div class="bar-row">
+        <span>Dummy</span>
+        <div class="bar">
+          <div class="fill" style="width:96.05%"></div>
+        </div>
+        <span>96.05%</span>
+      </div>
+
+      <div class="bar-row">
+        <span>Logistic</span>
+        <div class="bar">
+          <div class="fill" style="width:64.62%"></div>
+        </div>
+        <span>64.62%</span>
+      </div>
+
+      <div class="bar-row">
+        <span>Gradient Boosting</span>
+        <div class="bar">
+          <div class="fill" style="width:96.05%"></div>
+        </div>
+        <span>96.05%</span>
+      </div>
+
+    </div>
+
+    <figure>
+
+      <figcaption>
+        <strong>Figure 1.</strong>
+        Accuracy on the same held-out test split. The high baseline accuracy
+        illustrates why accuracy alone is misleading for this imbalanced task.
+      </figcaption>
+
+    </figure>
+
+    <h3>PR-AUC comparison</h3>
+
+    <div class="bar-chart">
+
+      <div class="bar-row">
+        <span>Logistic</span>
+        <div class="bar">
+          <div class="fill" style="width:13.23%"></div>
+        </div>
+        <span>0.1323</span>
+      </div>
+
+      <div class="bar-row">
+        <span>Gradient Boosting</span>
+        <div class="bar">
+          <div class="fill" style="width:21.89%"></div>
+        </div>
+        <span>0.2189</span>
+      </div>
+
+    </div>
+
+    <figure>
+
+      <figcaption>
+        <strong>Figure 2.</strong>
+        PR-AUC provides a more informative view of positive-class ranking
+        performance in this rare-event setting. HistGradientBoosting achieved
+        the higher PR-AUC of 0.2189.
+      </figcaption>
+
+    </figure>
+
+    <h3>What the results mean</h3>
+
+    <p>
+      Logistic Regression identified a large share of the positive cases,
+      with recall of 0.8793, but its precision was only 0.0905. This means
+      the model can be useful as a broad screening signal, but many pages
+      flagged by it would require human investigation.
+    </p>
+
+    <p>
+      HistGradientBoosting achieved the same overall accuracy as the dummy
+      baseline and a higher PR-AUC of 0.2189, but its recall at the evaluated
+      operating point was only 0.0043. It therefore did not provide a useful
+      high-recall screening behavior at that threshold.
+    </p>
+
+    <div class="callout success">
+      <strong>Main result:</strong>
+      The experiments demonstrate that model evaluation must match the
+      decision problem. For a rare “went dark” event, a 96% accuracy score
+      does not mean that the model is effectively finding pages that need
+      attention.
+    </div>
+
+  </section>
+
+
+  <!-- LIMITATIONS -->
+
+  <section id="limitations">
+
+    <h2>6. Limitations & Honest Framing</h2>
+
+    <p>
+      This study is a decision-support experiment, not a production ranking
+      system. The results describe relationships observed in the available
+      FlyRank data and validation design.
+    </p>
+
+    <h3>This work does not prove:</h3>
+
+    <ul>
+      <li>That any feature causes a page to lose discoverability.</li>
+      <li>That the model will improve search rankings.</li>
+      <li>That model scores represent causal risk.</li>
+      <li>That the model will generalize to every client or content type.</li>
+      <li>That the recommendations should be executed automatically.</li>
+    </ul>
+
+    <h3>Generalization</h3>
+
+    <p>
+      Search behavior, content types, competition and site conditions can
+      change over time. Results may therefore not generalize to unseen
+      clients, future search behavior, or content types not represented in
+      the original dataset.
+    </p>
+
+    <h3>Human oversight</h3>
+
+    <p>
+      Every recommendation requires human review. Analysts should check
+      content accuracy, search intent, business context, evidence and
+      alternative explanations before taking action.
+    </p>
+
+    <div class="callout warning">
+      <strong>No-go principle:</strong>
+      The system should not automatically publish content, delete pages,
+      create redirects, change metadata, make guaranteed ranking claims,
+      or replace editorial judgment.
+    </div>
+
+  </section>
+
+
+  <!-- RECOMMENDATIONS -->
+
+  <section id="recommendations">
+
+    <h2>7. Ranked Recommendations</h2>
+
+    <p>
+      The following action queue translates the analysis into a practical
+      human-review workflow. The ranking is a prioritization framework, not
+      an automated command list.
+    </p>
+
+    <div class="recommendations">
+
+      <div class="recommendation">
+
+        <span class="rank">#1 · HIGH PRIORITY · DECAY</span>
+
+        <h3>Refresh content showing performance decay</h3>
+
+        <p>
+          <strong>Evidence:</strong>
+          Observed decline in performance over time.
+        </p>
+
+        <p>
+          <strong>Human action:</strong>
+          Review the page's current accuracy, search intent, freshness and
+          competitive context before deciding whether an update is justified.
+        </p>
+
+      </div>
+
+
+      <div class="recommendation">
+
+        <span class="rank">#2 · HIGH PRIORITY · LOW_CTR</span>
+
+        <h3>Review pages with high impressions but weak CTR</h3>
+
+        <p>
+          <strong>Evidence:</strong>
+          Visibility is present but engagement is comparatively weak.
+        </p>
+
+        <p>
+          <strong>Human action:</strong>
+          Inspect the query/page alignment and determine whether the title,
+          snippet or content positioning needs review.
+        </p>
+
+      </div>
+
+
+      <div class="recommendation">
+
+        <span class="rank">#3 · MEDIUM PRIORITY · PERFORMANCE_DROP</span>
+
+        <h3>Investigate pages with measurable performance drops</h3>
+
+        <p>
+          <strong>Evidence:</strong>
+          Recent performance is weaker than the available baseline.
+        </p>
+
+        <p>
+          <strong>Human action:</strong>
+          Check whether the change may be related to seasonality,
+          competition, technical factors, content changes or another cause.
+        </p>
+
+      </div>
+
+
+      <div class="recommendation">
+
+        <span class="rank">#4 · MEDIUM PRIORITY · OPPORTUNITY</span>
+
+        <h3>Review pages with improvement opportunity</h3>
+
+        <p>
+          <strong>Evidence:</strong>
+          Model signals indicate pages worth further investigation.
+        </p>
+
+        <p>
+          <strong>Human action:</strong>
+          Use the model as a screening signal and combine it with editorial
+          and SEO judgment before taking action.
+        </p>
+
+      </div>
+
+    </div>
+
+    <h3>Monitoring and retraining triggers</h3>
+
+    <table>
+
+      <tr>
+        <th>Signal</th>
+        <th>Trigger</th>
+        <th>Response</th>
+      </tr>
+
+      <tr>
+        <td>Model performance</td>
+        <td>Sustained degradation on new observations</td>
+        <td>Revalidate or retrain</td>
+      </tr>
+
+      <tr>
+        <td>Feature distribution</td>
+        <td>Material distribution changes</td>
+        <td>Investigate data drift</td>
+      </tr>
+
+      <tr>
+        <td>Human agreement</td>
+        <td>Increasing disagreement with analysts</td>
+        <td>Review recommendation rules</td>
+      </tr>
+
+      <tr>
+        <td>Content type</td>
+        <td>New content types appear</td>
+        <td>Assess applicability</td>
+      </tr>
+
+      <tr>
+        <td>Outcome relationship</td>
+        <td>Feature/outcome relationships change</td>
+        <td>Reassess and potentially retrain</td>
+      </tr>
+
+    </table>
+
+  </section>
+
+
+  <!-- REPRODUCIBILITY -->
+
+  <section id="reproducibility">
+
+    <h2>8. Reproducibility</h2>
+
+    <p>
+      The analysis is organized in the GitHub repository so that the work
+      can be inspected and, where the required data access is available,
+      rerun.
+    </p>
+
+    <h3>Repository</h3>
+
+    <p>
+      <a
+        href="https://github.com/prithvirajr203-pixel/Notebook-FlyRank"
+        target="_blank"
+        rel="noopener"
+      >
+        GitHub Repository — Notebook-FlyRank
+      </a>
+    </p>
+
+    <h3>Capstone notebook</h3>
+
+    <p>
+      <a
+        href="https://github.com/prithvirajr203-pixel/Notebook-FlyRank/blob/main/work/notebooks/capstone.ipynb"
+        target="_blank"
+        rel="noopener"
+      >
+        Open capstone.ipynb
+      </a>
+    </p>
+
+    <h3>ML-10 Action Playbook</h3>
+
+    <p>
+      <a
+        href="https://github.com/prithvirajr203-pixel/Notebook-FlyRank/blob/main/work/notebooks/w07_action_playbook.ipynb"
+        target="_blank"
+        rel="noopener"
+      >
+        Open w07_action_playbook.ipynb
+      </a>
+    </p>
+
+    <h3>Exported action queue</h3>
+
+    <p>
+      <a
+        href="https://github.com/prithvirajr203-pixel/Notebook-FlyRank/blob/main/work/outputs/ranked_action_queue.csv"
+        target="_blank"
+        rel="noopener"
+      >
+        ranked_action_queue.csv
+      </a>
+    </p>
+
+    <div class="callout">
+      <strong>Reproducibility note:</strong>
+      The notebooks document the analysis workflow. Reproducing the complete
+      analysis may require access to the original internship dataset and
+      compatible execution dependencies.
+    </div>
+
+  </section>
+
+
+  <!-- ACKNOWLEDGMENTS -->
+
+  <section id="acknowledgments">
+
+    <h2>9. Acknowledgments & Data Credit</h2>
+
+    <p>
+      This project was completed as part of the Machine Learning track and
+      uses the FlyRank ML Internship dataset.
+    </p>
+
+    <p>
+      <strong>Data credit:</strong>
+      Built on the FlyRank ML Internship dataset.
+    </p>
+
+    <p>
+      Learn more about FlyRank:
+      <a
+        href="https://flyrank.ai"
+        target="_blank"
+        rel="noopener"
+      >
+        flyrank.ai
+      </a>
+    </p>
+
+    <p>
+      The analysis and recommendations presented here are the author's
+      interpretation of the available data and do not constitute a guarantee
+      of search-ranking outcomes.
+    </p>
+
+  </section>
+
+</main>
+
+
+<footer>
+
+  <div class="container">
+
+    <p>
+      <strong>Predicting Search Discoverability Loss with Machine Learning</strong>
+    </p>
+
+    <p>
+      Prithiviraj R. · ML-11 Research Paper
+    </p>
+
+    <p>
+      Built on the FlyRank ML Internship dataset.
+    </p>
+
+  </div>
+
+</footer>
+
+</body>
+</html>
