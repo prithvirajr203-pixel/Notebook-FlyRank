@@ -1,147 +1,138 @@
-# FlyRank ML Internship — Starter Repo
+# Predicting Search Visibility Loss — Went-Dark Prediction Model
 
-**Applied Search Intelligence: Google Search Ranking & Discoverability**
+## What this is
 
-This is the starting point for the FlyRank ML Internship. You **clone it into your own public
-repo** (one click — *Use this template*), build everything there, and submit that repo URL on
-each assignment in your portal — it's your workspace, your submission, and your portfolio all
-at once. The rhythm is simple: do the work, commit it, submit on the card. Done.
+A machine learning project that predicts whether a webpage will **go "dark"** — receive zero organic search clicks — the month after it was performing normally. It uses only information available up to that point (no future data), and ranks which February signals matter most for predicting a March drop-off.
 
-Everything here runs on a small **anonymized** slice of real FlyRank search data. No credentials,
-no private client data, no setup headaches.
+**Who it's for:** SEO teams, content teams, or anyone managing a large number of pages who wants an early-warning signal for pages at risk of losing search visibility, so they can be reviewed before traffic is actually lost.
 
-> **New here?** Two reads: **[SETUP.md](SETUP.md)** (GitHub, Colab, and data access — ten
-> minutes, with every silent pitfall flagged), then **[GUIDE.md](GUIDE.md)** (every file
-> explained, what to edit vs. leave alone, and where your own work goes — five minutes).
+**Live paper:** https://prithvirajr203-pixel.github.io/Paper-Asisgnemnt-Flyrank-/
 
 ---
 
-## Quickstart — first win in 2 minutes
-
-The fastest path is Google Colab (one click, zero install). Open Notebook 1 and run all cells:
-
-[![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/prithvirajr203-pixel/Notebook-FlyRank/blob/main/notebooks/01_first_look_and_discovery.ipynb?flush_cache=true)
- **Week 1 — Run it, then discover a real truth yourself**
-
-[![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/prithvirajr203-pixel/Notebook-FlyRank/blob/main/notebooks/02_your_first_readable_model.ipynb?flush_cache=true)
- **Week 2 — The model is just a rule you can read**
-
-[![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/prithvirajr203-pixel/Notebook-FlyRank/blob/main/notebooks/03_working_with_the_full_release.ipynb?flush_cache=true)
- **Weeks 3+ — The full release (~79M rows) via DuckDB, no download needed** — hosted at
- [`FlyRank/internship-warehouse`](https://huggingface.co/datasets/FlyRank/internship-warehouse) (gated: request access + accept the data-use terms, approval is instant)
-
----
-
-## Your assignment notebooks — open, fill, save, done
-
-Every assignment is one pre-named skeleton notebook in `work/notebooks/`. Click its badge,
-fill the sections in order, then **File → Save a copy in GitHub → OK** — the dialog is
-already pre-filled with your repo and the right path.
-
-> **The badges know whose repo they're in.** About 30 seconds after you create your copy, an
-> automatic commit ("Point Colab badges at this copy") rewires every badge in it to open
-> **your** notebooks — with your saved work — instead of the shared read-only ones. Reading
-> this on the shared starter page? The badges below open blank previews; make your copy
-> first ([SETUP.md](SETUP.md), Moment 1).
-
-| Week | Card | Notebook | Open |
-|---|---|---|---|
-| 1 | ML-02 | `w01_research_question` | [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/prithvirajr203-pixel/Notebook-FlyRank/blob/main/work/notebooks/w01_research_question.ipynb?flush_cache=true) |
-| 2 | ML-03 | `w02_ml_task_framing` | [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/prithvirajr203-pixel/Notebook-FlyRank/blob/main/work/notebooks/w02_ml_task_framing.ipynb?flush_cache=true) |
-| 3 | ML-04 | `w03_data_contract` | [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/prithvirajr203-pixel/Notebook-FlyRank/blob/main/work/notebooks/w03_data_contract.ipynb?flush_cache=true) |
-| 3 | ML-05 | `w03_feature_leakage_check` | [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/prithvirajr203-pixel/Notebook-FlyRank/blob/main/work/notebooks/w03_feature_leakage_check.ipynb?flush_cache=true) |
-| 4 | ML-06 | `w04_signal_audit` | [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/prithvirajr203-pixel/Notebook-FlyRank/blob/main/work/notebooks/w04_signal_audit.ipynb?flush_cache=true) |
-| 4 | ML-07 | `w04_baseline_score` | [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/prithvirajr203-pixel/Notebook-FlyRank/blob/main/work/notebooks/w04_baseline_score.ipynb?flush_cache=true) |
-| 5 | ML-08 | `w05_model` | [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/prithvirajr203-pixel/Notebook-FlyRank/blob/main/work/notebooks/w05_model.ipynb?flush_cache=true) |
-| 6 | ML-09 | `w06_validation_audit` | [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/prithvirajr203-pixel/Notebook-FlyRank/blob/main/work/notebooks/w06_validation_audit.ipynb?flush_cache=true) |
-| 7 | ML-10 | `w07_action_playbook` | [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/prithvirajr203-pixel/Notebook-FlyRank/blob/main/work/notebooks/w07_action_playbook.ipynb?flush_cache=true) |
-| 8 | ML-11 | `capstone` | [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/prithvirajr203-pixel/Notebook-FlyRank/blob/main/work/notebooks/capstone.ipynb?flush_cache=true) |
-
-Badges not opening *your* copy? Colab's built-in opener always works: **File → Open notebook
-→ GitHub tab** → paste `github.com/you/your-repo` → pick the notebook.
-
-### Prefer local?
-
-```bash
-git clone <this-repo-url>
-cd flyrank-ml-internship-starter
-pip install -r requirements.txt          # or: uv pip install -r requirements.txt
-python scripts/run_all.py
-```
-
-That runs the whole pipeline on the bundled sample and writes results to `outputs/`.
-
----
-
-## What you get
+## What you'll find in this repo
 
 | Path | What it is |
 |---|---|
-| `notebooks/` | Week 1–2 **first-win notebooks** (Colab-ready). Start here. |
-| `scripts/01–05` + `run_all.py` | The runnable reference pipeline: prepare → baseline → train → evaluate → PDF. |
-| `data/raw/content_refresh_anonymized.csv` | The anonymized starter dataset (~30k pages). |
-| `outputs/` | Example outputs so you can see the **target shape** (`model_report.md`, `refresh_queue_sample.csv`, `charts/`). |
-| `work/` | **Your space.** Lane experiments and your capstone live here — see `work/README.md`. |
-| `docs/` | The core docs + the data dictionary (see below). |
-
-### Read these (in `docs/`)
-
-1. **`ml-core-foundation-framework.md`** — the first-principles map of ML as a whole system. The backbone of the live sessions.
-2. **`ml-intern-dataset-and-lane-guide.md`** — how to use the data safely, the capstone workflow, and the analysis "lanes" you can pick from.
-3. **`intern-free-tooling-guide.md`** — the zero-budget tool stack (Python, Colab, free AI assistants). You never need to pay for anything.
-4. **`data-dictionary.md`** — all 44 columns: meaning, scale, and gotchas. Keep it open while you work.
+| `work/notebooks/capstone.ipynb` | The full, runnable notebook — data connection → features → models → results → recommendations |
+| `submission/paper_url.txt` | Link to the deployed research paper |
+| `docs/paper/index.html` | The deployed paper source |
 
 ---
 
-## The pipeline (what `run_all.py` does)
+## Setup (a stranger can follow this)
 
-```text
-01_prepare_features.py   clean + build the feature vector, define the label
-02_baseline_score.py     a transparent hand-rule "fix this first" score
-03_train_model.py        logistic regression, decision tree, random forest (client-holdout split)
-04_evaluate_and_export.py  ranked queue + charts + Markdown report
-05_build_pdf_report.py   a shareable PDF summary
+1. **Get access to the dataset** (free, instant approval):
+   - Go to the `FlyRank/internship-warehouse` dataset on Hugging Face
+   - Request access and accept the data-use terms — approval is instant
+   - Get a Hugging Face access token from your HF account settings
+
+2. **Open the notebook in Google Colab** (no local install needed):
+   - Click the "Open in Colab" badge at the top of `work/notebooks/capstone.ipynb`, or open it directly at:
+     `https://colab.research.google.com/github/prithvirajr203-pixel/Notebook-FlyRank/blob/main/work/notebooks/capstone.ipynb`
+
+3. **Add your Hugging Face token to Colab Secrets:**
+   - In Colab, click the key icon (🔑) in the left sidebar
+   - Add a new secret named `HF_TOKEN` with your Hugging Face token as the value
+   - Enable "Notebook access" for that secret
+
+4. **Run all cells:**
+   - `Runtime → Run all`
+   - The notebook connects to the dataset, builds the modeling dataset, trains the models, and prints/generates all results and charts
+
+That's it — no local Python setup, no downloads, no credentials beyond the one free Hugging Face token.
+
+---
+
+## Usage examples
+
+Once the notebook is running, you can:
+
+- **Reproduce the exact numbers in the paper** — every metric in the Results section comes directly from running this notebook top to bottom
+- **Change the eligibility filters** — e.g., adjust the minimum impressions/clicks thresholds in Section 2 to see how the modeling universe changes
+- **Try a different decision threshold** — Section 3.9 shows how precision/recall trade off across thresholds (0.05 to 0.50); pick the one that matches your own review capacity
+- **Re-run feature importance** — Section 4.3 re-computes permutation importance any time you retrain the model, so you can check which signals matter most for your own data window
+
+---
+
+## Architecture sketch
+
+```
+FlyRank Hugging Face Dataset (79M+ row warehouse)
+        │
+        ▼
+Feb 2026 partition ──► Aggregate GSC metrics per page
+        │                (impressions, clicks, CTR, position)
+        ▼
+Join with content metadata (word count, backlinks, search volume, etc.)
+        │
+        ▼
+Apply eligibility filters (published, not deleted, min traffic, created before window)
+        │
+        ▼
+     Feb "universe" (29,700 pages)
+        │
+        ▼
+Join with March 2026 outcomes ──► Label: went_dark = 1 if zero March clicks
+        │
+        ▼
+   Final modeling dataset (29,353 pages, 3.95% positive rate)
+        │
+        ├──► Dummy Baseline (majority class)
+        ├──► Logistic Regression (median impute + scale + balanced weights)
+        └──► HistGradientBoosting (native missing-value handling)
+        │
+        ▼
+Evaluate: Accuracy / Precision / Recall / F1 / PR-AUC / ROC-AUC
+        │
+        ▼
+Permutation importance ──► Ranked recommendations
 ```
 
-On the bundled sample, the learned model clearly beats the hand-written rule at picking the right
-pages to review first (**Precision@50 ≈ 0.24 → 0.74**; the model number can land 0.68–0.74
-depending on library versions — the ~3x lift is the point). The notebooks compute these numbers
-live, so they always reflect the current data and environment.
+---
 
-**Teaching point:** the model is the capstone, but the *workflow* is the lesson —
-`problem framing → data cleaning → baseline → first model → evaluation → explainable recommendation`.
+## Eval results (v2 — same split, model vs. baseline)
+
+| Model | Accuracy | Precision | Recall | F1 | PR-AUC | ROC-AUC |
+|---|---|---|---|---|---|---|
+| Dummy Baseline | 96.05% | 0.00% | 0.00% | 0.00% | — | — |
+| Logistic Regression | 64.62% | 9.05% | 87.93% | 16.42% | 0.1323 | 0.8270 |
+| HistGradientBoosting (t=0.50) | 96.05% | 50.00% | 0.43% | 0.85% | 0.2189 | 0.8700 |
+| HistGradientBoosting (t=0.15) | — | 23.99% | 38.36% | 29.52% | 0.2189 | 0.8700 |
+
+**Top predictive signals** (permutation importance, scored on PR-AUC):
+1. `clicks_feb` (0.1141)
+2. `impressions_feb` (0.0923)
+3. `char_count` (0.0519)
+
+Full results, charts, and interpretation are in the [deployed paper](https://prithvirajr203-pixel.github.io/Paper-Asisgnemnt-Flyrank-/).
 
 ---
 
-## Data safety (read `DATA_USE.md`)
+## Limitations
 
-- Only the small **anonymized** CSV ships here — no client names, domains, URLs, titles, or keywords.
-- **Never** add raw private client data to this repo or your fork. Need more data? Request an approved
-  release from your mentor — never export it yourself.
-- Don't paste client data into third-party AI tools.
-- Frame every result as **observed / measured / directional / decision-support** — never
-  "I predicted Google's algorithm."
+- **Limited time window** — trained on one month predicting the next; may not generalize across seasons.
+- **Severe class imbalance** — only 3.95% of pages went dark, so false positives remain substantial at any usable recall level.
+- **Association, not causation** — feature importance shows what predicts went-dark risk, not what causes it.
+- **Threshold sensitivity** — HistGradientBoosting's recall swings from 0.43% to 80.17% depending purely on the chosen decision threshold.
+- **Missing features** — technical SEO issues, indexing status, and algorithm changes aren't in this dataset and could be real confounders.
+- **Missing input data** — backlinks, word count, and char count had missing values, handled via imputation.
+- **Single train/test split** — no cross-validation or temporal rolling validation performed.
+- **Not yet operationally validated** — this model has never been used in a live SEO monitoring workflow.
 
-The `.gitignore` blocks datasets by default, and CI fails any commit that includes a dataset.
-
----
-
-## Assignments & schedule
-
-Weekly assignments, live events, and the capstone live on **your portal board** (your
-enrollment email has your access link). This repo is the shared technical foundation they all
-build on — and the `skills/` folder here is the instruction library for your AI assistant
-(start at [skills/README.md](skills/README.md)).
-
-**First time with GitHub?** You need exactly four things (full walkthrough: [SETUP.md](SETUP.md)):
-1. A free account at github.com.
-2. Your own copy of this repo: **Use this template → Create a new repository** → public.
-   (One click — brings the notebooks, `work/`, and the CI leak-guard with it.)
-3. In Colab: *File → Save a copy in GitHub* — opened from your copy's badges, the dialog is
-   already pre-filled with your repo and path, so it's just OK (Colab handles auth).
-4. That's your submission repo — share its **github.com/you/your-repo** URL with Assignment 1
-   (never a colab.research.google.com or drive.google.com link).
+Full limitations discussion in the [paper](https://prithvirajr203-pixel.github.io/Paper-Asisgnemnt-Flyrank-/).
 
 ---
 
-*Track leads: Mirza Ašćerić (ML) · Hole (data engineering). Code under MIT (see `LICENSE`); data under `DATA_USE.md`.*
+## Built with AI
+
+I built this project with Claude (Anthropic). Claude helped me: debug and fix broken notebook cells (the ranked-recommendations and artifact-generation sections), draft the structure and prose of the research paper and this README from my own model results, and troubleshoot GitHub Pages deployment issues. I ran the notebook myself, verified every number reported here against the actual notebook output, and made the modeling decisions (feature selection, leakage exclusions, threshold choices) myself.
+
+---
+
+## Links
+
+- **Live paper:** https://prithvirajr203-pixel.github.io/Paper-Asisgnemnt-Flyrank-/
+- **Repository:** https://github.com/prithvirajr203-pixel/Notebook-FlyRank
+- **Notebook (Colab):** https://colab.research.google.com/github/prithvirajr203-pixel/Notebook-FlyRank/blob/main/work/notebooks/capstone.ipynb
+- **Data source:** Built on the [FlyRank ML Internship dataset](https://flyrank.ai)
